@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancer Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+    <style>
+        /* Additional CSS for image preview grid */
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .image-preview img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .image-preview img:hover {
+            transform: scale(1.05);
+        }
+        /* Result display styling */
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .result-title {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .result-item {
+            margin: 10px 0;
+        }
+        .confidence-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin-top: 5px;
+            position: relative;
+        }
+        .confidence-value {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #4CAF50, #FFC107);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cancer Detection</h1>
+        <p>Upload your medical scans for analysis</p>
+    </header>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/detection">Cancer Detection</a>
+        <a href="/lifestyle">Lifestyle Analysis</a>
+        <a href="/support">AI Support</a>
+    </nav>
+    <div class="container">
+        <h2>Upload Your Medical Scan</h2>
+        <input type="file" id="scanUpload" accept="image/*">
+        <button class="button" onclick="analyzeScan()">Analyze</button>
+        
+        <!-- Image Preview Section -->
+        <div id="imagePreview" class="image-preview"></div>
+
+        <!-- Analysis Result Section -->
+        <div id="result"></div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Multi-Cancer Detection Project</p>
+    </footer>
+    <script>
+        // Function to handle image preview
+        document.getElementById('scanUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.innerHTML = ''; // Clear previous previews
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    imagePreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.innerHTML = '<p>No image selected.</p>';
+            }
+        });
+
+        // Function to analyze scan using backend API
+        function analyzeScan() {
+            const fileInput = document.getElementById('scanUpload');
+            const resultDiv = document.getElementById('result');
+            
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // Show loading animation
+                resultDiv.innerHTML = `
+                    <div class="result-card">
+                        <div class="result-title">Analyzing your scan...</div>
+                        <div class="loader"></div>
+                    </div>
+                `;
+                
+                // Send to backend API
+                fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        resultDiv.innerHTML = `
+                            <div class="result-card">
+                                <div class="result-title" style="color: red;">Error: ${data.error}</div>
+                            </div>
+                        `;
+                    } else {
+                        // Format confidence as percentage
+                        const cancerConfidence = (data.cancer_confidence * 100).toFixed(2);
+                        const malignancyConfidence = (data.malignancy_confidence * 100).toFixed(2);
+                        
+                        resultDiv.innerHTML = `
+                            <div class="result-card">
+                                <div class="result-title">Analysis Results</div>
+                                <div class="result-item">
+                                    <strong>Detected Cancer Type:</strong> ${data.cancer_type.replace('_', ' ')}
+                                    <div class="confidence-bar">
+                                        <div class="confidence-value" style="width: ${cancerConfidence}%"></div>
+                                    </div>
+                                    <small>Confidence: ${cancerConfidence}%</small>
+                                </div>
+                                <div class="result-item">
+                                    <strong>Classification:</strong> ${data.malignancy}
+                                    <div class="confidence-bar">
+                                        <div class="confidence-value" style="width: ${malignancyConfidence}%"></div>
+                                    </div>
+                                    <small>Confidence: ${malignancyConfidence}%</small>
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `
+                        <div class="result-card">
+                            <div class="result-title" style="color: red;">Error: Could not connect to the server</div>
+                        </div>
+                    `;
+                    console.error('Error:', error);
+                });
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="result-card">
+                        <div class="result-title" style="color: red;">Please upload a scan first.</div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

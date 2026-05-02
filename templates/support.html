@@ -1,0 +1,96 @@
+<!-- ==========================
+FULL UPDATED support.html
+========================== -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Support</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+
+<header>
+    <h1>AI Support Assistant</h1>
+    <p>We're here to help you</p>
+</header>
+
+<nav>
+    <a href="/">Home</a>
+    <a href="/detection">Cancer Detection</a>
+    <a href="/lifestyle">Lifestyle Analysis</a>
+    <a href="/support">AI Support</a>
+</nav>
+
+<div class="container">
+
+    <h2>Chat with AI</h2>
+
+    <div id="chatbox">
+
+        <div id="chatlog" class="chat-log">
+            <div class="msg ai">
+                <p>Hello 👋 I am your Cancer Support Assistant. Ask me about symptoms, detection, treatment, or hospitals.</p>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type message...">
+            <button class="button" onclick="sendMessage()">Send</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+let lastMessage = "";
+
+function formatAIResponse(text) {
+    return text
+        .replace(/\*\*/g, '')
+        .replace(/\*/g, '')
+        .replace(/\n/g, '<br>');
+}
+
+function sendMessage() {
+    const input = document.getElementById('userInput');
+    const chatlog = document.getElementById('chatlog');
+
+    if (input.value.trim() === "") return;
+
+    let message = input.value;
+
+    if (message.toLowerCase() === "more" || message.toLowerCase() === "tell more") {
+        message = "Explain more about " + lastMessage;
+    }
+
+    lastMessage = input.value;
+
+    chatlog.innerHTML += `
+        <div class="msg user">
+            <p>${input.value}</p>
+        </div>
+    `;
+
+    fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        chatlog.innerHTML += `
+            <div class="msg ai">
+                <p>${formatAIResponse(data.response)}</p>
+            </div>
+        `;
+        chatlog.scrollTop = chatlog.scrollHeight;
+    });
+
+    input.value = '';
+}
+</script>
+
+</body>
+</html>

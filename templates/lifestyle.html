@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifestyle Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Lifestyle Analysis</h1>
+        <p>Assess your cancer risk based on lifestyle factors</p>
+    </header>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/detection">Cancer Detection</a>
+        <a href="/lifestyle">Lifestyle Analysis</a>
+        <a href="/support">AI Support</a>
+    </nav>
+    <div class=".form-container">
+        <h2>Enter Your Lifestyle Information</h2>
+        <form id="lifestyleForm">
+            <label for="smoking">Smoking Habits:</label>
+            <select id="smoking">
+                <option value="none">Non-smoker</option>
+                <option value="occasional">Occasional smoker</option>
+                <option value="regular">Regular smoker</option>
+            </select>
+            <label for="diet">Diet:</label>
+            <select id="diet">
+                <option value="healthy">Healthy</option>
+                <option value="moderate">Moderate</option>
+                <option value="unhealthy">Unhealthy</option>
+            </select>
+            <label for="stress">Stress Levels:</label>
+            <select id="stress">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <button type="button" class="button" onclick="assessRisk()">Assess Risk</button>
+        </form>
+        <div id="riskResult" style="margin-top: 20px;"></div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Multi-Cancer Detection Project</p>
+    </footer>
+    <script>
+        function assessRisk() {
+            const smoking = document.getElementById('smoking').value;
+            const diet = document.getElementById('diet').value;
+            const stress = document.getElementById('stress').value;
+            const riskResult = document.getElementById('riskResult');
+            let risk = 'Low';
+            if (smoking === 'regular' || diet === 'unhealthy' || stress === 'high') {
+                risk = 'High';
+            } else if (smoking === 'occasional' || diet === 'moderate' || stress === 'medium') {
+                risk = 'Medium';
+            }
+            riskResult.innerHTML = `<p>Your cancer risk is: <strong>${risk}</strong></p>`;
+        }
+    </script>
+</body>
+</html>
