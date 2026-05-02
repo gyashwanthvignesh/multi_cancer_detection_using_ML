@@ -19,7 +19,7 @@ MODEL_LINKS = {
     "cancer_type_model.keras": "https://drive.google.com/file/d/1S_PjeZxAZacng7K1Vj_RCcaUUdHBJBSV/view?usp=drive_link",
     "breast_cancer_model.keras": "https://drive.google.com/file/d/184UmuXEBbgtvGULP5kdADnEjeFVY3qUR/view?usp=drive_link",
     "lung_cancer_model.keras": "https://drive.google.com/file/d/1RIstW0kHfUAOIHradn3bGP816Obpoc6s/view?usp=drive_link",
-    "skin_cancer_model.keras": "https://drive.google.com/file/d/PUT_CORRECT_ID/view?usp=drive_link"
+    "skin_cancer_model.keras": "https://drive.google.com/file/d/1cvBGrZH_N1qXo1Y5-3QVPj_mgj19qKDL/view?usp=drive_link"
 }
 
 # ==========================
