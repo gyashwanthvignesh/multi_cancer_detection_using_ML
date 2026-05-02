@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    environment {
+        VENV = "venv"
+    }
+
+    stages {
+
+        stage('Clone') {
+            steps {
+                echo "Cloning repository..."
+            }
+        }
+
+        stage('Setup Python') {
+            steps {
+                sh 'python3 --version'
+            }
+        }
+
+        stage('Create Virtual Environment') {
+            steps {
+                sh 'python3 -m venv venv'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Test') {
+            steps {
+                sh '''
+                . venv/bin/activate
+                python scripts/check.py
+                '''
+            }
+        }
+
+    }
+}
